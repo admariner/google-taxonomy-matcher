@@ -21,15 +21,14 @@ def load_taxonomy(base_category, taxonomy_file, taxonomy_url, fetch_online=False
     else:
         taxonomy_content = open(taxonomy_file).read()
     lines = taxonomy_content.split('\n')
-    if base_category:
-        filtered_lines = []
-        for index, bc in enumerate(base_category):
-            base_category[index] = bc.strip().lower()
-        for bc in base_category:
-            filtered_lines += [line for line in lines if line.strip().lower().startswith(bc.strip().lower())]
-        return filtered_lines
-    else:
+    if not base_category:
         return lines
+    filtered_lines = []
+    for index, bc in enumerate(base_category):
+        base_category[index] = bc.strip().lower()
+    for bc in base_category:
+        filtered_lines += [line for line in lines if line.strip().lower().startswith(bc.strip().lower())]
+    return filtered_lines
 
 
 def index_product_info(product_dict):
@@ -58,7 +57,7 @@ def match(ix, category, weights=None):
         results = searcher.search(parsed_query, terms=True)
         score = 0
         if results:
-            logging.debug("Category: %s => Query: %s" % (category, query))
+            logging.debug(f"Category: {category} => Query: {query}")
         for r in results:
             weight = 1
             if weights:
@@ -101,9 +100,7 @@ def get_best_match(matches):
 
 def safe_get(row, column):
     value = row.get(column)
-    if isinstance(value, basestring):
-        return value
-    return ''
+    return value if isinstance(value, basestring) else ''
 
 
 if __name__ == "__main__":
